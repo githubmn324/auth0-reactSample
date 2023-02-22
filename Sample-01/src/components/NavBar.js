@@ -37,6 +37,22 @@ const NavBar = () => {
         }
     });
 
+    //kimura: forInvitation https://github.com/auth0/auth0-react/blob/master/EXAMPLES.md
+    const InvitationloginWithRedirect = () =>{
+      const { loginWithRedirect } = useAuth0();
+      const url = window.location.href;
+      const inviteMatches = url.match(/invitation=([^&]+)/);
+      const orgMatches = url.match(/organization=([^&]+)/);
+      if (inviteMatches && orgMatches) {
+        loginWithRedirect({
+          authorizationParams: {
+            organization: orgMatches[1],
+            invitation: inviteMatches[1],
+          }
+        });
+      }
+    }
+
   return (
     <div className="nav-container">
       <Navbar color="light" light expand="md">
@@ -75,12 +91,53 @@ const NavBar = () => {
                     id="qsLoginBtn"
                     color="primary"
                     className="btn-margin"
+
                     onClick={() => loginWithRedirect()}
+                    // onClick={() => loginWithRedirect({organization:'org_23TKPAv1T8ihNBol'})}
                   >
                     Log in
                   </Button>
                 </NavItem>
               )}
+
+              {/* kimura: org login button */}
+              {!isAuthenticated && (
+                <NavItem>
+                  <Button
+                    id="qsLoginBtn-org-kimura"
+                    color="primary"
+                    className="btn-margin"
+
+                    // onClick={() => loginWithRedirect()}
+                    // onClick={() => loginWithRedirect({organization:'org_23TKPAv1T8ihNBol'})}
+                    onClick={() => loginWithRedirect({
+                      authorizationParams: {
+                      organization: 'org_23TKPAv1T8ihNBol'}})}
+                  >
+                    Log in Org-Kimura
+                  </Button>
+                </NavItem>
+              )}
+              {/* kimura: org login button */}
+              {!isAuthenticated && (
+                <NavItem>
+                  <Button
+                    id="qsLoginBtn-org-kimura02"
+                    color="primary"
+                    className="btn-margin"
+
+                    // onClick={() => loginWithRedirect()}
+                    // onClick={() => loginWithRedirect({organization:'org_23TKPAv1T8ihNBol'})}
+                    onClick={() => loginWithRedirect({
+                      authorizationParams: {
+                      organization: 'org_fgek9MrqXIR7mLDT'}})}
+                  >
+                    Log in Org-Kimura02
+                  </Button>
+                </NavItem>
+              )}
+
+
               {isAuthenticated && (
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret id="profileDropDown">
