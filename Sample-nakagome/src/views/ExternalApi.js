@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Button, Alert } from "reactstrap";
 import Highlight from "../components/Highlight";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
@@ -18,7 +18,6 @@ export const ExternalApiComponent = () => {
   });
 
   const {
-    user,
     getAccessTokenSilently,
     loginWithPopup,
     getAccessTokenWithPopup,
@@ -58,25 +57,58 @@ export const ExternalApiComponent = () => {
 
     await callApi();
   };
-
-  const callApi = async () => {
+  
+  const clearContents = () => {
+    setState({
+      ...state,
+      showResult: false,
+      apiMessage: "",
+    });
+  }
+  
+  const callWorkflowApi = async() => {
     try {
+      
+      clearContents();
 
       const token = await getAccessTokenSilently({
         authorizationParams: { 
           audience: audience
         },
       });
-      console.log({
-        token: token
-      })
-      
-      const response = await fetch(`${apiOrigin}/api/external`, {
+      const response = await fetch(`${apiOrigin}/api/external/workflow`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+      const responseData = await response.json();
+      console.log(responseData)
+      setState({
+        ...state,
+        showResult: true,
+        apiMessage: responseData,
+      });
+    } catch (error) {
+      setState({
+        ...state,
+        error: error.error,
+      });
+    }
+  }
+
+  const callApi = async() => {
+    try {
+      clearContents();
+      const token = await getAccessTokenSilently({
+        authorizationParams: { 
+          audience: audience
+        },
+      });
+      const response = await fetch(`${apiOrigin}/api/external/api2`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       // // CORS Errorで正しくリクエストが送信されない為、サーバ経由でリクエスト送信
       // const response = await fetch(`${audience}api1`, {
       //   method: "GET",
@@ -84,9 +116,8 @@ export const ExternalApiComponent = () => {
       //     'Authorization': `Bearer ${token}`
       //   }
       // });
-
       const responseData = await response.json();
-
+      console.log(responseData)
       setState({
         ...state,
         showResult: true,
@@ -99,7 +130,7 @@ export const ExternalApiComponent = () => {
       });
     }
   };
-
+  
   const handle = (e, fn) => {
     e.preventDefault();
     fn();
@@ -195,10 +226,19 @@ export const ExternalApiComponent = () => {
         <Button
           color="primary"
           className="mt-5"
+          onClick={callWorkflowApi}
+          disabled={!audience}
+        >
+          API Gateway → BFF → Workflow → api1 server
+        </Button>
+        <br />
+        <Button
+          color="primary"
+          className="mt-5"
           onClick={callApi}
           disabled={!audience}
         >
-          Ping API
+          API Gateway → BFF → api2 server
         </Button>
       </div>
 

@@ -41,12 +41,27 @@ const checkJwt = jwt({
   algorithms: ["RS256"],
 });
 
-app.get("/api/external", checkJwt, (req, res) => {
+app.get("/api/external/workflow", checkJwt, (req, res) => {
   request.get({
-      uri: `${authConfig.audience}/bff`,
+      uri: `${authConfig.audience}/bff/workflow`,
       headers: {'Authorization': req.get('Authorization')},
       qs: {
-          // GETのURLの後に付く?hoge=hugaの部分
+        // GETのURLの後に付く?hoge=hugaの部分
+      },
+      json: true
+  }, function(err, req, data){
+      res.send({
+        data
+      });
+  });
+});
+
+app.get("/api/external/api2", checkJwt, (req, res) => {
+  request.get({
+      uri: `${authConfig.audience}/bff/api2`,
+      headers: {'Authorization': req.get('Authorization')},
+      qs: {
+        // GETのURLの後に付く?hoge=hugaの部分
       },
       json: true
   }, function(err, req, data){
